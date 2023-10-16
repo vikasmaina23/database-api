@@ -1,0 +1,76 @@
+const mongoose = require('mongoose');
+
+const playerSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  team: String,
+  // ... other fields
+});
+
+const Player = mongoose.model('Player', playerSchema);
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+const port = 3000;
+
+app.use(bodyParser.json());
+
+// Add a new player
+app.post('/api/players', async (req, res) => {
+  const player = new Player(req.body);
+  await player.save();
+  res.json(player);
+});
+
+// Update a player by ID
+app.put('/api/players/:id', async (req, res) => {
+  await Player.findByIdAndUpdate(req.params.id, req.body);
+  res.json({ message: 'Player updated' });
+});
+
+// Delete a player by ID
+app.delete('/api/players/:id', async (req, res) => {
+  await Player.findByIdAndRemove(req.params.id);
+  res.json({ message: 'Player deleted' });
+});
+
+// Define routes for your predefined queries
+app.get('/api/players/query1', (req, res) => {
+  // Query logic for query 1
+});
+
+// ... Repeat for other query endpoints
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+// Query 1: The Player with the most touchdown passes
+app.get('/api/players/most-touchdown-passes', async (req, res) => {
+  const mostTouchdownPassesPlayer = await Player.findOne().sort({ touchdownPasses: -1 });
+  res.json(mostTouchdownPassesPlayer);
+});
+
+// Query 2: The Player with the most rushing yards
+app.get('/api/players/most-rushing-yards', async (req, res) => {
+  const mostRushingYardsPlayer = await Player.findOne().sort({ rushingYards: -1 });
+  res.json(mostRushingYardsPlayer);
+});
+
+// Query 3: The Player with the least rushing yards
+app.get('/api/players/least-rushing-yards', async (req, res) => {
+  const leastRushingYardsPlayer = await Player.findOne().sort({ rushingYards: 1 });
+  res.json(leastRushingYardsPlayer);
+});
+
+// Query 4: A list of players sorted from most to fewest field goals made
+app.get('/api/players/sort-by-field-goals-made', async (req, res) => {
+  const playersSortedByFieldGoalsMade = await Player.find().sort({ fieldGoalsMade: -1 });
+  res.json(playersSortedByFieldGoalsMade);
+});
+
+// Query 5: The Player with the most number of sacks
+app.get('/api/players/most-sacks', async (req, res) => {
+  const mostSacksPlayer = await Player.findOne().sort({ sacks: -1 });
+  res.json(mostSacksPlayer);
+});
